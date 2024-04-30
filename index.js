@@ -26,30 +26,28 @@ app.get('/api/hello', function(req, res) {
 
 app.post('/api/shorturl', (req, res) => {
   const url = req?.body?.url
-  // dns.lookup(url, {family: 0}, (err, address, family) => {
-  //   if(address){
-  //     const new_data = {
-  //       original_url: url,
-  //       short_url: ((encoded_url_data.length + 1)).toString()
-  //     }
-  
-  //     encoded_url_data.push(new_data)
-  //     res.json(new_data)
-  //   } else {
-  //     res.json({ error: 'invalid url'})
-  //   }
-  // })
+  let result;
 
-  if (!url.toString().toLowerCase().startsWith('http://www')){
-    res.json({ error: 'invalid url' })
-  }
-  const new_data = {
-    original_url: url,
-    short_url: (encoded_url_data.length + 1).toString()
-  }
+  dns.lookup(url, {family: 0}, (err, address, family) => {
+    if(err) result = { error: 'invalid url' }
+    const new_data = {
+      original_url: url,
+      short_url: ((encoded_url_data.length + 1)).toString()
+    }
 
-  encoded_url_data.push(new_data)
-  res.json(new_data)
+    encoded_url_data.push(new_data)
+    result = new_data
+  })
+
+  res.json(result)
+
+  // const new_data = {
+  //   original_url: url,
+  //   short_url: (encoded_url_data.length + 1).toString()
+  // }
+
+  // encoded_url_data.push(new_data)
+  // res.json(new_data)
   
 })
 
