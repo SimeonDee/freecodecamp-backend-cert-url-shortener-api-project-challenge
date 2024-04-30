@@ -4,6 +4,7 @@ const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser')
 const dns = require('dns')
+const URL = require('url').URL
 
 // Basic Configuration
 const port = process.env.PORT || 3000;
@@ -26,21 +27,22 @@ app.get('/api/hello', function(req, res) {
 
 app.post('/api/shorturl', (req, res) => {
   const url = req?.body?.url
-  let result;
+  const urlObj = new URL(url)
 
-  dns.lookup(url, {family: 0}, (err, address, family) => {
-    if(err) result = { error: 'invalid url' }
-    const new_data = {
-      original_url: url,
-      short_url: ((encoded_url_data.length + 1)).toString()
+  dns.lookup(urlObj.hostname, function(err, address, family){
+    if(err) { 
+      res.json({ error: 'invalid url' })
+    } else {
+      const new_data = {
+        original_url: url,
+        short_url: ((encoded_url_data.length + 1)).toString()
+      }
+  
+      encoded_url_data.push(new_data)
+      res.json(new_data)
     }
-
-    encoded_url_data.push(new_data)
-    result = new_data
   })
-
-  res.json(result)
-
+  
   // const new_data = {
   //   original_url: url,
   //   short_url: (encoded_url_data.length + 1).toString()
