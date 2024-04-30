@@ -42,15 +42,6 @@ app.post('/api/shorturl', (req, res) => {
       res.json(new_data)
     }
   })
-  
-  // const new_data = {
-  //   original_url: url,
-  //   short_url: (encoded_url_data.length + 1).toString()
-  // }
-
-  // encoded_url_data.push(new_data)
-  // res.json(new_data)
-  
 })
 
 app.get('/api/shorturl/:short_url', (req, res) => {
