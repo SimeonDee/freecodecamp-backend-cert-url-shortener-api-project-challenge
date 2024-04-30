@@ -2,13 +2,18 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const app = express();
+const bodyParser = require('body-parser')
+const dns = require('dns')
 
 // Basic Configuration
 const port = process.env.PORT || 3000;
+const encoded_url_data = []
 
 app.use(cors());
 
 app.use('/public', express.static(`${process.cwd()}/public`));
+
+app.use(bodyParser.urlencoded({ extended: false }))
 
 app.get('/', function(req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
@@ -18,6 +23,48 @@ app.get('/', function(req, res) {
 app.get('/api/hello', function(req, res) {
   res.json({ greeting: 'hello API' });
 });
+
+app.post('/api/shorturl', (req, res) => {
+  const url = req?.body?.url
+  // dns.lookup(url, {family: 0}, (err, address, family) => {
+  //   if(address){
+  //     const new_data = {
+  //       original_url: url,
+  //       short_url: ((encoded_url_data.length + 1)).toString()
+  //     }
+  
+  //     encoded_url_data.push(new_data)
+  //     res.json(new_data)
+  //   } else {
+  //     res.json({ error: 'invalid url'})
+  //   }
+  // })
+
+  const new_data = {
+    original_url: url,
+    short_url: (encoded_url_data.length + 1).toString()
+  }
+
+  encoded_url_data.push(new_data)
+  res.json(new_data)
+  
+})
+
+app.get('/api/shorturl/:short_url', (req, res) => {
+  let original_url;
+  try{
+    const found_data = encoded_url_data.find(data => data.short_url === req.params.short_url)
+    if(found_data){
+      const { original_url } = found_data
+      res.redirect(original_url)
+    } else {
+      res.json({ error: 'invalid url'})
+    }
+  } catch(err){
+    res.json({ error: 'invalid url'})
+  }
+})
+
 
 app.listen(port, function() {
   console.log(`Listening on port ${port}`);
