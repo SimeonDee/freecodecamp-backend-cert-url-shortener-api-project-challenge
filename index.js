@@ -40,6 +40,9 @@ app.post('/api/shorturl', (req, res) => {
   //   }
   // })
 
+  if (!url.toString().toLowerCase().startsWith('http://www')){
+    res.json({ error: 'invalid url' })
+  }
   const new_data = {
     original_url: url,
     short_url: (encoded_url_data.length + 1).toString()
